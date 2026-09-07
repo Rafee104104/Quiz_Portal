@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container container-center">
+    <div class="row justify-content-center">
+        <button><a href="{% url 'addParticipant' %}" class="btn btn-success">Add</a></button>
+        <br><br>
+        <table class="table">
+            <tr>
+                <th>Participant Name</th>
+                <th>Participant Class</th>
+                <th>Participant Age</th>
+                <th>Participant Institution</th>
+                <th>Add</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+            {% for participant in participants %}
+            <tr>
+                <td>{{participant.name}}</td>
+                <td>{{participant.Class}}</td>
+                <td>{{participant.Age}}</td>
+                <td>{{participant.Institution}}</td>
+                <td><a href="{% url 'addParticipant' %}" class="btn btn-success">Add</a></td>
+                <td><a href="{% url 'editParticipant' participant.id %}" class="btn btn-primary">Edit</a></td>
+                <td><a href="{% url 'deleteParticipant' participant.id %}" class="btn btn-danger">Delete</a></td>
+            </tr>
+            {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
