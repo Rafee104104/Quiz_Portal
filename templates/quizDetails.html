@@ -6,22 +6,29 @@
         <div class="col-md-6">
             <table class="table">
                 <tr>
-                    <th>S1</th>
+                    <th>Serial No:</th>
                     <th>Quiz Question</th>
                 </tr>
                 {% for question in questions %}
                 <tr>
                     <td>{{forloop.counter}}</td>
                     <td>{{question.question}}</td>
+                    
                 </tr>
+                
                 <tr>
                     {% for option in question.options.all %}
-                    <td>{{forloop.counter}}</td>
+                    <td>({{forloop.counter}})</td>
                     <td>{{option.option}}</td>
+                    
                     {% endfor %}
+                    
                 </tr>
+
                 {% endfor %}
+                
             </table>
+            <input class="btn btn-success" type="submit" value="Submit">
         </div>
     </div>
 </div>
