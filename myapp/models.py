@@ -14,14 +14,14 @@ class Quiz(models.Model):
         return self.title
 
 class Question(models.Model):
-    quiz=models.ForeignKey(Quiz,on_delete=models.DO_NOTHING,related_name='questions')
+    quiz=models.ForeignKey(Quiz,on_delete=models.DO_NOTHING,related_name='questions',blank=True,null=True)
     question =models.TextField(max_length=300,blank=True,null=True)
 
     def __str__(self):
         return self.question
 
 class Option(models.Model):
-     question = models.ForeignKey(Question,on_delete=models.DO_NOTHING,related_name='options')
+     question = models.ForeignKey(Question,on_delete=models.DO_NOTHING,related_name='options',blank=True,null=True)
      option = models.TextField(max_length=300,blank=True,null=True)
      is_correct = models.BooleanField(default='false',blank=True,null=True)
 
@@ -37,3 +37,9 @@ class Participant(models.Model):
 
     def __str__(self):
         return self.Name
+
+class QuizResult(models.Model):
+    participant = models.ForeignKey(Participant,on_delete=models.CASCADE,related_name='participant',blank=True,null=True)
+    quiz = models.ForeignKey(Quiz,on_delete=models.CASCADE,related_name='participant',blank=True,null=True)
+    score = models.PositiveIntegerField(default=0)
+    submitted_at = models.DateTimeField(auto_now_add=True)

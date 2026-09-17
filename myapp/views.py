@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import request
 from .models import *
 from django.contrib.auth import *
 from .forms import *
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 # Create your views here.
 def registration(request):
     if(request.method == "POST"):
@@ -18,6 +19,146 @@ def registration(request):
         form = RegistrationForm()
     return render(request,'registrationform.html',{'form':form})
 
+def result_view(request, quiz_id):
+    
+    participant = get_object_or_404(
+        Participant,
+        user = request.user
+    )
+
+    quiz = get_object_or_404(
+        Quiz,
+        id = quiz_id
+    )
+
+    result = QuizResult.objects.filter(
+        participant=participant,
+        quiz=quiz
+    ).order_by("-submitted_at").first()
+
+    if result is None:
+        return redirect("dashboard")
+
+    better_scores = QuizResult.objects.filter(
+        quiz=quiz,
+        score__gt = result.score
+    ).values("participant").distinct().count()
+
+    position = better_scores +1
+
+    return render(
+        request,
+        "quiz.html",
+        {
+            'quiz':quiz,
+            'result':quiz,
+            'position':position
+        }
+    )
+
+@login_required
+def take_quiz(request, quiz_id):
+    quiz = Quiz.objects.get(id=quiz_id)
+
+    if request.method == "POST":
+        score = 0
+
+        questions = quiz.questions.all()
+
+        for question in questions:
+            selected_option_id = request.POST.get(
+                f"question_{question.id}"
+            )
+
+            if selected_option_id:
+                correct = question.options.filter(
+                    id=selected_option_id,
+                    is_correct=True
+                ).exists()
+
+                if correct:
+                    score += 1
+
+        return redirect(
+            "take_quiz",
+            quiz_id=quiz.id
+        )
+
+    questions = quiz.questions.order_by("?")
+
+    question_data = []
+
+    for question in questions:
+        options = question.options.order_by("?")
+
+        question_data.append({
+            "question": question,
+            "options": options
+        })
+
+    return render(
+        request,
+        'quiz.html',
+        {
+            "quiz": quiz,
+            "question_data": question_data
+        }
+    )
+
+# def take_quiz(request,quiz_id):
+#     quiz = Quiz.objects.get(id=quiz_id).all()
+#     if request.method=="POST":
+#         score = 0
+
+#         questions = quiz.questions.all()
+
+#         for question in questions:
+
+#             selected_option_id = request.POST.get(
+#                 f"question_{question.id}"
+#             )
+
+#             if selected_option_id:
+
+#                 correct = question.options.filter(
+#                     id = selected_option_id,
+#                     is_correct = True
+#                 ).exists()
+
+#                 if correct:
+#                     score += 1
+
+#         QuizResult.objects.create(
+#             participant = participant,
+#             quiz = quiz,
+#             score = score
+#         )
+
+#         return redirect(
+#             "take_quiz",
+#             quiz_id=quiz.id
+#         )
+
+
+#     questions = quiz.questions.order_by("?")
+
+#     question_data = []
+
+#     for question in questions:
+
+#         options = question.options().order_by("?")
+
+#         question_data.append({
+#             "question" : question,
+#             "options" : options
+#         })
+
+#     return render(request,'quiz.html',
+#         {
+#             "quiz" : quiz,
+#             "question_data" : question_data
+#         }
+#     )
 
 def userlogin(request):
     if request.method=="POST":
@@ -67,7 +208,7 @@ def editParticipant(request,my_id):
                 form.save()
                 return redirect('participant')
     else:
-        form = ParticipantForm()
+        form = ParticipantForm(instance=participant)
     return render(request,'editParticipant.html',{'form':form})
 @login_required
 def deleteParticipant(request,my_id):

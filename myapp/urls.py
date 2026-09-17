@@ -13,6 +13,9 @@ urlpatterns = [
     path('deleteQuiz/<int:id>',deleteQuiz,name='deleteQuiz'),
     path('addQuestion/',addQuestion,name='addQuestion'),
     path('addQuiz/',addQuiz,name='addQuiz'),
+    path('take_quiz/<int:quiz_id>',take_quiz,name='take_quiz'),
     path('quizDetails/<int:id>',quizDetails,name='quizDetails'),
-    path('user_logout/',user_logout,name='user_logout')
+    path('user_logout/',user_logout,name='user_logout'),
+     path('quiz/',result_view,name='quiz')
+    
 ]
