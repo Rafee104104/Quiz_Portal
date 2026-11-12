@@ -30,6 +30,7 @@ class Option(models.Model):
 
 class Participant(models.Model):
     #  Name Class Age gender Institution
+    user = models.ForeignKey(CustomUser,on_delete=models.DO_NOTHING,related_name='participants',blank=True,null=True)
     Name = models.TextField(max_length=90,blank=True,null=True)
     Class = models.CharField(max_length=90,blank=True,null=True)
     Age = models.IntegerField(blank=True,null=True)

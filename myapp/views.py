@@ -56,8 +56,71 @@ def result_view(request, quiz_id):
         }
     )
 
+
+@login_required
+def participant_info(request):
+
+    participant = Participant.objects.filter(
+        user=request.user
+    ).first()
+
+    if request.method == "POST":
+
+        form = ParticipantForm(
+            request.POST,
+            instance=participant
+        )
+
+        if form.is_valid():
+            participant = form.save(commit=False)
+            participant.user = request.user
+            participant.save()
+
+            return redirect("dashboard")
+
+    else:
+        form = ParticipantForm(
+            instance=participant
+        )
+
+    return render(
+        request,
+        "participant_form.html",
+        {"form": form}
+    )
+
+@login_required
+def dashboard(request):
+
+    participant = get_object_or_404(
+        Participant,
+        user=request.user
+    )
+
+    quizzes = Quiz.objects.all()
+
+    results = QuizResult.objects.filter(
+        participant=participant
+    )
+
+    return render(
+        request,
+        "dashboard.html",
+        {
+            "participant": participant,
+            "quizzes": quizzes,
+            "results": results,
+        }
+    )
+
 @login_required
 def take_quiz(request, quiz_id):
+
+    participant = Participant.objects.get_object_or_404(
+        Participant,
+        user = request.user
+    )
+
     quiz = Quiz.objects.get(id=quiz_id)
 
     if request.method == "POST":
@@ -95,7 +158,7 @@ def take_quiz(request, quiz_id):
             "question": question,
             "options": options
         })
-
+    print(question_data)
     return render(
         request,
         'quiz.html',
@@ -105,60 +168,6 @@ def take_quiz(request, quiz_id):
         }
     )
 
-# def take_quiz(request,quiz_id):
-#     quiz = Quiz.objects.get(id=quiz_id).all()
-#     if request.method=="POST":
-#         score = 0
-
-#         questions = quiz.questions.all()
-
-#         for question in questions:
-
-#             selected_option_id = request.POST.get(
-#                 f"question_{question.id}"
-#             )
-
-#             if selected_option_id:
-
-#                 correct = question.options.filter(
-#                     id = selected_option_id,
-#                     is_correct = True
-#                 ).exists()
-
-#                 if correct:
-#                     score += 1
-
-#         QuizResult.objects.create(
-#             participant = participant,
-#             quiz = quiz,
-#             score = score
-#         )
-
-#         return redirect(
-#             "take_quiz",
-#             quiz_id=quiz.id
-#         )
-
-
-#     questions = quiz.questions.order_by("?")
-
-#     question_data = []
-
-#     for question in questions:
-
-#         options = question.options().order_by("?")
-
-#         question_data.append({
-#             "question" : question,
-#             "options" : options
-#         })
-
-#     return render(request,'quiz.html',
-#         {
-#             "quiz" : quiz,
-#             "question_data" : question_data
-#         }
-#     )
 
 def userlogin(request):
     if request.method=="POST":
@@ -252,6 +261,24 @@ def addQuestion(request):
     else:
         form = QuestionForm()
     return render(request,'addQuestion.html',{'form':form})
+
+@login_required
+def editQuestion(request,id):
+    question = Question.objects.get(id=id)
+    if request.method == "POST":
+            form = QuestionForm(request.POST,instance=question)
+            if form.is_valid():
+                form.save()
+                return redirect('homepage')
+    else:
+        form = QuestionForm(question)
+    return render(request,'editQuestion.html',{'form':form})
+@login_required
+def deleteQuestion(request,id):
+    question = Question.objects.get(id=id)
+    question.delete()
+    return redirect('deleteQuestion')
+
 @login_required
 def addOption(request):
     if request.method == "POST":
@@ -262,6 +289,24 @@ def addOption(request):
     else:
         form = OptionForm()
     return render(request,'addOption.html',{'form':form})
+
+@login_required
+def editOption(request,id):
+    option = Option.objects.get(id=id)
+    if request.method == "POST":
+            form = OptionForm(request.POST,instance=option)
+            if form.is_valid():
+                form.save()
+                return redirect('homepage')
+    else:
+        form = OptionForm(option)
+    return render(request,'editOption.html',{'form':form})
+@login_required
+def deleteQuiz(request,id):
+    option = Option.objects.get(id=id)
+    option.delete()
+    return redirect('deleteOption')
+
 @login_required
 def homepage(request):
 
