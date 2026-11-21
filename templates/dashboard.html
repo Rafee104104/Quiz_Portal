@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    <div>
+        <div>
+            <div>
+                
+                <p>Logged in as: {{ request.user.username }}</p>
+            </div>
+        </div>
+        {% if isAdmin %}
+        <div>
+            
+            <div>
+                <a href="{% url 'addQuiz' %}">Create New Quiz</a>
+            </div>
+        </div>
+        <h5>Manage Quizzes</h5>
+        <div>
+            <table class="table table-secodary table-striped">
+                <thead>
+                    <tr>
+                        <th>Quiz Title</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for quiz in quizzes %}
+                    <tr>
+                        <td>{{ quiz.title }}</td>
+                        <td>{{ quiz.description|default:"No description provided" }}</td>
+                        <td><a href="{% url 'quizDetails' quiz.id %}">View</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No quizzes created yet. Click 'Create New Quiz' to get started.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div>
+            <div>
+                <div>
+                    <span>PARTICIPANT PROFILE</span>
+                    <h5>{{ profile.name|default:request.user.username }}</h5>
+                    
+                </div>
+                <a href="{% url 'editProfile' %}">Edit Profile</a>
+            </div>
+        </div>
+        <h5>Available Quizzes</h5>
+        <div>
+            <table class="table table-secodary table-striped">
+                <thead>
+                    <tr>
+                        <th>Quiz Title</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for quiz in quizzes %}
+                    <tr>
+                        <td>{{ quiz.title }}</td>
+                        <td>{{ quiz.description|default:"No description provided" }}</td>
+                        <td><a href="{% url 'take_quiz' quiz.id %}">Start</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No quizzes are currently available to participate.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

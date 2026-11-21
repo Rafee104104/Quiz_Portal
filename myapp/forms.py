@@ -48,8 +48,13 @@ class RegistrationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ['username','email','password1','password2']
+        fields = ['username','email','password1','password2','user_type']
         # fields = ('__all__')
+
+class AdminForm(forms.ModelForm):
+    class Meta:
+        model = Admin
+        fields = ['name','age','gender','institution']
 
 class QuizForm(forms.ModelForm):
     class Meta:
@@ -69,4 +74,5 @@ class OptionForm(forms.ModelForm):
 class ParticipantForm(forms.ModelForm):
     class Meta:
         model = Participant
-        fields = ['Name','Class','Age','Institution']
+        fields = ['name','student_class','age','gender','institution']
+

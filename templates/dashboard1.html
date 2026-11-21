@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Participant Dashboard</h2>
+
+<p>
+    Name: {{ participant.name }}
+</p>
+
+<p>
+    Institution: {{ participant.institution }}
+</p>
+
+<hr>
+
+<h3>Available Quizzes</h3>
+
+{% for quiz in quizzes %}
+
+    <div>
+
+        <h4>{{ quiz.title }}</h4>
+
+        <p>
+            {{ quiz.description }}
+        </p>
+
+        <a href="{% url 'take_quiz' quiz.id %}">
+            Participate
+        </a>
+
+    </div>
+
+    <hr>
+
+{% empty %}
+
+    <p>No quiz is currently available.</p>
+
+{% endfor %}
+
+{% endblock %}
